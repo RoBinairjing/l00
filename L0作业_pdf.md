@@ -1,5 +1,6 @@
 
 ## 1. 交易被用户使用eth_sendRawTransaction接口发送给执行层客户端，交易会如何被保存？
+
    Transaction 的执行主要在发生在两个 Workflow 中:
       1. Miner 在打包新的 Block 时。此时 Miner 会按 Block 中 Transaction 的打包顺
       序来执行其中的 Transaction。
@@ -19,11 +20,12 @@
    是很有可能最终被持久化到 LevelDB 中的)？
       结论是显然的。因此在 Byzantium 分叉之后，在一个 Block 的验证周期中只会计算一次的 State Root。我们仍然可以在
    state_processor.go 找寻到早年代码的痕迹。最终，一个 Block 中所有 Transaction
-   执行的结果使得 World State 发生状态转移。
+   执行的结果使得 World State 发生状态转移
 ---
 
 ## 2. 交易被保存后，如何被选中？
-   我们想要通过 Transaction 的 Hash 查询一个 Transaction 具体的数据的时
+
+   我们想要通过Transaction的Hash 查询一个 Transaction具体的数据的时
 候，上层的 API 会调用 eth/api_backend.go 中的 GetTransaction() 函数，并最终调
 用了 core/rawdb/accessors_indexes.go 中的 ReadTransaction() 函数来查询。
    在读取 Transaction 的时候，ReadTransaction() 函数首先
@@ -34,6 +36,7 @@
 ---
 
 ## 3. 一个交易消耗的gas如何计算？是什么时候从sender账户扣除？
+
 commitTransactions 函数进行计算gas
    首先这个函数会给 Block 设置最大可以使用的 Gas 的上限
    函数的主体是一个 For 循环
@@ -52,6 +55,7 @@ all() 函数
 ---
 
 ## 4. 创建合约交易和普通交易处理方式的区别？
+
    外部账户 (EOA) 是由用户直接控制的账户，负责签名并发起交易 (Transac-
 tion)。用户通过控制 Account 的私钥来保证对账户数据的控制权。
    合约账户 (Contract)，简称为合约，是由外部账户通过 Transaction 创建的。合
@@ -75,7 +79,6 @@ RPC 接口来直接调用对应的合约中的只读函数。如果用户需要�
 Transaction 每次调用一个合约中的一个写函数。因为，如果想在链上实现复杂的逻
 辑，需要将写函数接口化，在其中调用更多的逻辑。
 
-
    从数据层面讲，外部账户 (EOA) 与合约账户 (Contract) 不同的点在于: 外部账户
 并没有维护自己的代码 (codeHash) 以及额外的 Storage 层。相比与外部账户，合约
 账户额外保存了一个存储层 (Storage) 用于存储合约代码中持久化的变量的数据。在
@@ -89,7 +92,7 @@ Transaction 每次调用一个合约中的一个写函数。因为，如果想�
 | **作用**         | 负责签名并发起交易               | 部署新合约到链上                       |
 
 ---
- 
+
 ## 5. 创建合约有什么限制？
 
 ---
