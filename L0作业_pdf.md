@@ -5,7 +5,7 @@
       1. Miner 在打包新的 Block 时。此时 Miner 会按 Block 中 Transaction 的打包顺序来执行其中的 Transaction。
       2. 其他节点添加 Block 到 Blockchain 时。当节点从网络中监听并获取到新的Block 时，它们会执行 Block 中的 
    Transaction，来更新本地的 State Trie 的Root，并与 Block Header 中的 State Trie Root 进行比较，来验证 Block 的合法性。
-
+      
       一条 Transaction 执行，可能会涉及到多个 Account/Contract 的值的变化，最
    终造成一个或多个 Account 的 State 的发生转移。在 Byzantium 分叉之前的 Geth 版
    本中，在每个 Transaction 执行之后，都会计算一个当前的 State Trie Root，并写入
