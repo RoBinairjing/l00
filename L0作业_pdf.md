@@ -1,16 +1,19 @@
 
 ## 1. 交易被用户使用eth_sendRawTransaction接口发送给执行层客户端，交易会如何被保存？
 
-```markdown
-	Transaction 的执行主要在发生在两个 Workflow 中:
-      1. Miner 在打包新的 Block 时。此时 Miner 会按 Block 中 Transaction 的打包顺序来执行其中的 Transaction。
-      2. 其他节点添加 Block 到 Blockchain 时。当节点从网络中监听并获取到新的Block 时，它们会执行 Block 中的 
+Transaction 的执行主要在发生在两个 Workflow 中:
+  1. Miner 在打包新的 Block 时。此时 Miner 会按 Block 中 Transaction 的打包顺序来执行其中的 Transaction。
+
+  2. 其他节点添加 Block 到 Blockchain 时。当节点从网络中监听并获取到新的Block 时，它们会执行 Block 中的 
     Transaction，来更新本地的 State Trie 的Root，并与 Block Header 中的 State Trie Root 进行比较，来验证 Block 的合法性。
-	一条 Transaction 执行，可能会涉及到多个 Account/Contract 的值的变化，最终造成一个或多个 Account 的 State 的发生转移。在 Byzantium 分叉之前的 Geth 版本中，在每个 Transaction 执行之后，都会计算一个当前的 State Trie Root，并写入到对应的 Transaction Receipt 中。这符合以太坊黄皮书中的原始设计。即交易是使得 Ethereum 状态机发生状态状态转移的最细粒度单位。
-	“每个 Transaction 都会重算一个 State Trie Root” 的方式岂不是会带来大量的计算 (重算一次一个 MPT Path 上的所有 Node) 和读写开销 (新生成的 MPT Node是很有可能最终被持久化到 LevelDB 中的)？
-	因此在 Byzantium 分叉之后，在一个 Block 的验证周期中只会计算一次的 State Root。我们仍然可以在state_processor.go 找寻到早年代码的痕迹。最终，一个 Block 中所有 Transaction执行的结果使得 World State 发生状态转移。
-```
-------
+
+一条 Transaction 执行，可能会涉及到多个 Account/Contract 的值的变化，最终造成一个或多个 Account 的 State 的发生转移。在 Byzantium 分叉之前的 Geth 版本中，在每个 Transaction 执行之后，都会计算一个当前的 State Trie Root，并写入到对应的 Transaction Receipt 中。这符合以太坊黄皮书中的原始设计。即交易是使得 Ethereum 状态机发生状态状态转移的最细粒度单位。
+
+“每个 Transaction 都会重算一个 State Trie Root” 的方式岂不是会带来大量的计算 (重算一次一个 MPT Path 上的所有 Node) 和读写开销 (新生成的 MPT Node是很有可能最终被持久化到 LevelDB 中的)？
+
+因此在 Byzantium 分叉之后，在一个 Block 的验证周期中只会计算一次的 State Root。我们仍然可以在state_processor.go 找寻到早年代码的痕迹。最终，一个 Block 中所有 Transaction执行的结果使得 World State 发生状态转移。
+
+
 
 ## 2. 交易被保存后，如何被选中？
 
